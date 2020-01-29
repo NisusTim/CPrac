@@ -1,12 +1,12 @@
-#include <stdio.h>
 #include <stdbool.h>  // bool
 #include <string.h>   // memset(), NULL
 #include "vm_seg.h"
+#include <stdio.h>
 
 /************************************************
  * Forward Declarations                         *
  ************************************************/
-void InitVmSeg(VmSeg *self, void *ptr, UINTPTR_T size);
+void InitVmSeg(VmSeg *self, void *base, UINTPTR_T size);
 /*static void *MAlloc(VmSeg *self, UINTPTR_T size);*/
 static void *MAlloc(VmSeg *self, UINTPTR_T size, void **ptr);
 static void *CAlloc(VmSeg *self, UINTPTR_T num, UINTPTR_T size);
@@ -16,11 +16,13 @@ static void compaction(mem_priv_t *);
 static mem_t *mem_search_allocated(mem_priv_t *, void *);
 static inline void mem_table_reset(mem_t *, UINTPTR_T);
 static mem_t *mem_blank_get(mem_t *);
-static void mem_table_dump(mem_t *);
-static void mem_chain_dump(mem_t *);
-static void mem_priv_dump(mem_priv_t *);
+#if VM_SEG_DEBUG
+void mem_table_dump(mem_t *);
+void mem_chain_dump(mem_t *);
+void mem_priv_dump(mem_priv_t *);
+#endif
 
-////
+/*
 int main(void)
 {
   VmSeg s;
@@ -43,8 +45,8 @@ int main(void)
   s.MAlloc(&s, 0x30, &a);
   s.MAlloc(&s, 0x30, &d);
   mem_chain_dump(s.mem_priv.head);
-  /*mem_priv_dump(&s.mem_priv);*/
 }
+*/
 
 /************************************************
  * APIs                                         *
@@ -194,8 +196,12 @@ static mem_t *mem_search_allocated(mem_priv_t *priv, void *ptr)
   return NULL;
 }
 
+/**************************************************
+ * Test                                           *
+ **************************************************/
+#if VM_SEG_DEBUG
 // dump through array table.
-static void mem_table_dump(mem_t *table)
+void mem_table_dump(mem_t *table)
 {
   for (uint8_t i = 0; i < kMemCap; ++i)
     printf(" [%2u] base: 0x%08lX, size: 0x%08lX, next: 0x%08lX, "\
@@ -205,7 +211,7 @@ static void mem_table_dump(mem_t *table)
 }
 
 // dump through pointer chain.
-static void mem_chain_dump(mem_t *thru)
+void mem_chain_dump(mem_t *thru)
 {
   uint8_t i = 0;
 
@@ -216,7 +222,7 @@ static void mem_chain_dump(mem_t *thru)
 }
 
 // dump priv info.
-static void mem_priv_dump(mem_priv_t *priv)
+void mem_priv_dump(mem_priv_t *priv)
 {
   printf("  rgn_base:  0x%08lX\n", priv->rgn_base);
   printf("  rgn_limit: 0x%08lX\n", priv->rgn_limit);
@@ -225,3 +231,4 @@ static void mem_priv_dump(mem_priv_t *priv)
   printf("  rgn_used:  0x%08lX\n", priv->rgn_limit - priv->rgn_base - priv->rgn_free);
   printf("  mem_csize:   %8u\n", priv->mem_csize);
 }
+#endif

@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define VM_SEG_DEBUG  1
+
 #if UINTPTR_MAX == 0xFFFF
   #define UINTPTR_T uint16_t
 #elif UINTPTR_MAX == 0xFFFFFFFF
@@ -12,7 +14,7 @@
 #endif
 
 enum _VmSegPublicConst {
-  kMemCap  =  8
+  kMemCap  = 32
 };
 
 typedef struct _MEM {
@@ -35,13 +37,17 @@ typedef struct _MEM_PRIVATE {
 
 typedef struct _VmSeg {
   mem_priv_t mem_priv;
-  //void *     (*MAlloc)(struct _VmSeg *self, UINTPTR_T size);
   void *     (*MAlloc)(struct _VmSeg *self, UINTPTR_T size, void **ptr);
   void *     (*CAlloc)(struct _VmSeg *self, UINTPTR_T num, UINTPTR_T size);
   void *     (*ReAlloc)(struct _VmSeg *self, void *ptr, UINTPTR_T size);
   void       (*Free)(struct _VmSeg *self, void *ptr);
 } VmSeg;
 
-void InitVmSeg(VmSeg *self, void *ptr, UINTPTR_T size);
+void InitVmSeg(VmSeg *self, void *base, UINTPTR_T size);
+#if VM_SEG_DEBUG
+void mem_table_dump(mem_t *);
+void mem_chain_dump(mem_t *);
+void mem_priv_dump(mem_priv_t *);
+#endif
 
 #endif  // VM_SEG_H_
