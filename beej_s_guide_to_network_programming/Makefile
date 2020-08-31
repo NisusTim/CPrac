@@ -20,5 +20,17 @@ p24: p24_connect.c
 p26: p26_listen_accept.c
 	$(CC) p26_listen_accept.c -o p26_listen_accept
 
+p30: p30_stream_server.c
+	$(CC) p30_stream_server.c -o p30_stream_server
+
+p33: p33_stream_client.c
+	$(CC) p33_stream_client.c -o p33_stream_client
+
+p48: p48_select.c
+	$(CC) p48_select.c -o p48_select
+
+p49: p49_select_server.c
+	$(CC) p49_select_server.c -o p49_select_server
+
 clean:
 	rm -rf *.o $(shell find . -maxdepth 1 -type f -executable)

@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   struct addrinfo *p;
 
   if (argc != 2) {
-    fprintf(stderr, "usage: showip <hostname>\n");
+    fprintf(stderr, "usage: %s <hostname>\n", argv[0]);
     return 1;
   }
 

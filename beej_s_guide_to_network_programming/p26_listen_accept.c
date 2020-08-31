@@ -1,8 +1,8 @@
 #include <netdb.h>
 #include <string.h>
 
-#define MY_PORT   "3490"
-#define BACK_LOG  10      // how many pending connections queue will hold
+#define MY_PORT  "3490"
+#define BACKLOG  10      // how many pending connections queue will hold
 
 int main(void)
 {
@@ -26,7 +26,7 @@ int main(void)
   // make a socket, bint it, and listen on it
   sock_fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
   bind(sock_fd, res->ai_addr, res->ai_addrlen);
-  listen(sock_fd, BACK_LOG);
+  listen(sock_fd, BACKLOG);
 
   // accept an incoming connections
   addr_size = sizeof(their_addr);
