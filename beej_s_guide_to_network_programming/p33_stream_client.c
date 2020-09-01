@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define PORT           "3490"
 #define MAX_DATA_SIZE  100
 
 // get sockaddr, IPv4 or IPv6
@@ -29,17 +28,21 @@ int main(int argc, char *argv[])
   struct addrinfo *p;
 
   char s[INET6_ADDRSTRLEN];
+  const char *ip = argv[1];
+  const char *port = argv[2];
+  const char *cmd = argv[3];
 
-  if (argc != 2) {
-    fprintf(stderr, "usage: %s <hostname>\n", argv[0]);
-    return 1;
-  }
+//  if (argc != 2) {
+//    fprintf(stderr, "usage: %s <hostname>\n", argv[0]);
+//    return 1;
+//  }
 
   memset(&hints, 0, sizeof(hints));
   hints.ai_family = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_PASSIVE;
 
-  if ((rv = getaddrinfo(NULL, PORT, &hints, &serv_info)) != 0) {
+  if ((rv = getaddrinfo(ip, port, &hints, &serv_info)) != 0) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
     return 1;
   }
@@ -76,6 +79,10 @@ int main(int argc, char *argv[])
   }
   buff[num_bytes] = '\0';
   printf("client: received '%s'\n", buff);
+
+  const char *to_send = cmd;
+  send(sock_fd, to_send, sizeof(to_send), 0);
+
   close(sock_fd);
 
   return 0;

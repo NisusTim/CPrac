@@ -8,6 +8,12 @@
 
 int main(int argc, char *argv[])
 {
+  if (argc < 2) {
+    printf("usage: %s <port>\n", argv[0]);
+    return 1;
+  }
+  int port = (int)strtol(argv[1], NULL, 10);
+
   int sock_fd = 0;
   int sock_fd_client = 0;
   char buff[256] = {};
@@ -28,7 +34,7 @@ int main(int argc, char *argv[])
 
   server_info.sin_family = PF_INET;
   server_info.sin_addr.s_addr = INADDR_ANY;
-  server_info.sin_port = htons(8700);
+  server_info.sin_port = htons(port);
   bind(sock_fd, (struct sockaddr *)&server_info, sizeof(server_info));
   listen(sock_fd, 5);
 

@@ -9,6 +9,13 @@
 
 int main(int argc, char *argv[])
 {
+  if (argc < 3) {
+    printf("usage: %s <hostname> <port>\n", argv[0]);
+    return 1;
+  }
+  char *ip = argv[1];
+  int port = (int)strtol(argv[2], NULL, 10);
+
   int sock_fd = 0;
   sock_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -21,9 +28,9 @@ int main(int argc, char *argv[])
   info.sin_family = PF_INET;
 
   // localhost test
-  /*info.sin_addr.s_addr = inet_addr("127.0.0.1");*/
-  info.sin_addr.s_addr = inet_addr("192.168.10.200");
-  info.sin_port = htons(8700);
+  info.sin_addr.s_addr = inet_addr(ip);
+  info.sin_port = htons(port);
+  printf("%s: %d\n", ip, port);
 
   int err = connect(sock_fd, (struct sockaddr *)&info, sizeof(info));
   if (err == -1) {

@@ -40,8 +40,8 @@ int main(void)
   struct addrinfo *p;
 
   int new_fd;
-  socklen_t sin_size;
   struct sockaddr_storage their_addr;
+  socklen_t sin_size = sizeof(their_addr);
   char s[INET6_ADDRSTRLEN];
   struct sigaction sa;
 
@@ -97,7 +97,6 @@ int main(void)
   printf("server: waiting for connections...\n");
   // main accept() loop
   while (1) {
-    sin_size = sizeof(their_addr);
     new_fd = accept(sock_fd, (struct sockaddr *)&their_addr, &sin_size);
 
     if (new_fd == -1) {
