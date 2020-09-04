@@ -41,21 +41,42 @@ int main(int argc, char *argv[])
   }
 
   char *port = argv[1];
-  int listen_fd = 0;
-  int accept_fd = 0;
-  struct sockaddr_storage acpt_info;
-  socklen_t sin_size = sizeof(acpt_info);
-  char ip_str[INET6_ADDRSTRLEN];
 
-  if (server_init(&listen_fd, port, 5) != 0) {
-    return 2;  // error
+  //
+  int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+  if (listen_fd < 0) {
+    printf("  tcps: Failed to create a socket.\n");
   }
+
+  struct sockaddr_in server_info;
+  struct sockaddr_in acpt_info;
+  unsigned int sin_size = sizeof(acpt_info);
+  bzero(&server_info, sizeof(server_info));
+
+  server_info.sin_family = PF_INET;
+  server_info.sin_addr.s_addr = INADDR_ANY;
+  server_info.sin_port = htons((int)strtol(port, NULL, 10));
+  bind(listen_fd, (struct sockaddr *)&server_info, sizeof(server_info));
+  listen(listen_fd, 5);
+
+  //
+//  int listen_fd = 0;
+  int accept_fd = 0;
+//  struct sockaddr_storage acpt_info;
+//  socklen_t sin_size = sizeof(acpt_info);
+  char ip_str[INET6_ADDRSTRLEN];
+//
+//  if (server_init(&listen_fd, port, 5) != 0) {
+//    return 2;  // error
+//  }
 
   DBGP("  %s: waiting for incoming connections...\n", TCPS);
   pthread_t tid;
-  while ((accept_fd = accept(listen_fd, 
+  while ((accept_fd = accept(listen_fd,
                              (struct sockaddr *)&acpt_info, &sin_size))) {
-    inet_ntop(acpt_info.ss_family, sockaddr_get((struct sockaddr *)&acpt_info),
+  //  inet_ntop(acpt_info.ss_family, sockaddr_get((struct sockaddr *)&acpt_info),
+    inet_ntop(acpt_info.sin_family, sockaddr_get((struct sockaddr *)&acpt_info),
               ip_str, sizeof(ip_str));
     DBGP("  %s: connection accept. accept_fd: %d\n", TCPS, accept_fd);
     DBGP("  %s: from %s\n", TCPS, ip_str);
@@ -76,15 +97,19 @@ int main(int argc, char *argv[])
 // return 0: success
 int server_init(int *fd, const char *port, int backlog)
 {
-  struct addrinfo hints = {0};
+  struct addrinfo hints;
   struct addrinfo *res;
   int err_code = 0;
 
   // check input: port
 
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_canonname = NULL;
+  hints.ai_addr = NULL;
+  hints.ai_next = NULL;
   hints.ai_family = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags = AI_PASSIVE;
+  hints.ai_flags = AI_PASSIVE | AI_NUMERICSERV;
   
   if ((err_code = getaddrinfo(NULL, port, &hints, &res)) != 0) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(err_code));
@@ -105,14 +130,15 @@ int server_init(int *fd, const char *port, int backlog)
 // return 0: success
 int srv_socket_new(int *fd, const struct addrinfo *srv)
 {
-  int yes = 1;
+  int opt_val = 1;
 
   for (; srv != NULL; srv = srv->ai_next) {
     *fd = socket(srv->ai_family, srv->ai_socktype, srv->ai_protocol);
     if (*fd < 0) {
       continue;
     }
-    if (setsockopt(*fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+    if (setsockopt(*fd, SOL_SOCKET, SO_REUSEADDR, &opt_val, sizeof(opt_val))
+        == -1) {
       return 1;  // error
     }
     if (bind(*fd, srv->ai_addr, srv->ai_addrlen) == -1) {

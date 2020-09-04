@@ -38,9 +38,12 @@ int main(int argc, char *argv[])
 //  }
 
   memset(&hints, 0, sizeof(hints));
+  hints.ai_canonname = NULL;
+  hints.ai_addr = NULL;
+  hints.ai_next = NULL;
   hints.ai_family = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags = AI_PASSIVE;
+  hints.ai_flags = AI_NUMERICSERV;
 
   if ((rv = getaddrinfo(ip, port, &hints, &serv_info)) != 0) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
