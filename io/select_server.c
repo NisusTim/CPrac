@@ -22,22 +22,47 @@ int main(int argc, char *argv[])
 {
   int server_socket = setup_server(SERVER_PORT, SERVER_BACKLOG);
 
+  int max_socket_so_far = 0;
   fd_set current_sockets, ready_sockets;
 
-  // initilize
+  // initialize my current set
+  FD_ZERO(&current_sockets);
+  /*FD_ZERO(&ready_sockets);*/
+  FD_SET(server_socket, &current_sockets);
+  max_socket_so_far = server_socket;
+
+  printf("FD_SETSIZE=%d\n", FD_SETSIZE);
+  printf("max_socket_so_far=%d\n", max_socket_so_far);
 
   while (true) {
+    // because select is destructive
+    ready_sockets = current_sockets;
 
     printf("Waiting for connections...\n");
-    // wait for, and eventually accept on incoming connection
-    int client_socket = accept_new_connection(server_socket);
+    if (select(max_socket_so_far+1, &ready_sockets, NULL, NULL, NULL) < 0) {
+      perror("Select error");
+      exit(EXIT_FAILURE);
+    }
 
-    // do whatever we do with connections
-    handle_connection(client_socket);
+    for (int i = 0; i <= max_socket_so_far; ++i) {
+      if (FD_ISSET(i, &ready_sockets)) {
+        if (i == server_socket) {
+          // this is a new connection
+          int client_socket = accept_new_connection(server_socket);
+          FD_SET(client_socket, &current_sockets);
+          if (client_socket > max_socket_so_far)
+            max_socket_so_far = client_socket;
+        } else {
+          // do whatever we do with connections
+          handle_connection(i);
+          FD_CLR(i, &current_sockets);
+        }
+      }
+    }
 
   }  // while
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 int setup_server(short port, int backlog)
