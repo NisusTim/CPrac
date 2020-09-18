@@ -5,6 +5,8 @@
 #include <unistd.h>      // read()
 
 #include <string.h>
+#include "types.h"
+#include "console_cmd.h"
 
 /*
  * - fd_set to be singleton? or can be multiple?
@@ -22,8 +24,6 @@
  */
 
 #define STDIN     0
-#define ENABLED   1
-#define DISABLED  0
 /* config */
 #define DEFAULT_TRIM_MODE  ENABLED
 
@@ -32,7 +32,7 @@ int set_fds(void);
 int handle_fds(int err_code);
 char *trim_newline(char *str);
 int stdin_handler(char *str, int size);
-void hello(void);
+void hello(int argc, const char *argv[]);
 
 // fd set
 fd_set READ_FDS;
@@ -42,17 +42,17 @@ fd_set EXCEPT_FDS;
 // fd_set ;
 int MAX_FD = 1;
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int err_code;
+  cnsl_cmd_reg("cnsl", hello);
 
   while (true) {
 
     reset_fds();
-
     err_code = select(MAX_FD+1, &READ_FDS, &WRITE_FDS, &EXCEPT_FDS, NULL);
-
     handle_fds(err_code);
+
   }
 }
 
@@ -90,10 +90,8 @@ int handle_fds(int err_code)
             int n = read(STDIN, buff, sizeof(buff));
             n = stdin_handler(buff, n);
             printf("  stdin: '%s' (%d)\n", buff, n);
+            cnsl_cmd_handle(buff);
             fflush(stdout);
-
-            if (!strcmp(buff, "k"))
-              hello();
           }
         
       }
@@ -140,7 +138,18 @@ int stdin_handler(char *str, int size)
   return size;
 }
 
-void hello(void)
+void hello(int argc, const char *argv[])
 {
-  printf("hello\n");
+  switch (argc) {
+    case 1:
+        printf("...\n");
+      break;
+    case 2:
+      if (!strcmp(argv[1], "damn"))
+        printf("damn!?\n");
+      break;
+    default:
+        printf("hello~~~\n");
+      break;
+  }
 }
