@@ -15,11 +15,15 @@ int main(int argc, char *argv[])
 
     cl_fd = accept(sv_fd, NULL, NULL);
     printf("accept connection! (%d)\n", cl_fd);
-    while (1) {
+
+    for ( ; ; ) {
+
       read_cnt = read(cl_fd, buf, sizeof(buf));
       printf("read_cnt %d\n", read_cnt);
       send_cnt = write(cl_fd, buf, read_cnt);
       printf("send_cnt %d\n", send_cnt);
+
     }
+
   }
 }

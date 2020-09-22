@@ -90,6 +90,7 @@ static int ipv4_passive_socket(const char *port, int type, bool do_listen,
 
   if (do_listen) {
     if (listen(sv_socket, backlog) == SOCKET_ERROR) {
+      // no need to close socket?
       perror("listen");
       return SOCKET_ERROR;
     }
