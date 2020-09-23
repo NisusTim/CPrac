@@ -1,10 +1,24 @@
 CC := gcc
+CFLAGS := -I../lib/
+
+demo_us_xfr: us_xfr_sv us_xfr_cl
+	./us_xfr_sv > b &
+	ls -lF /tmp/us_xfr
+	cat *.h > a
+	./us_xfr_cl < a
+	diff a b
+
+us_xfr_sv: us_xfr_sv.c us_xfr.h
+	$(CC) $(CFLAGS) ${@}.c -o $@
+
+us_xfr_cl: us_xfr_cl.c us_xfr.h
+	$(CC) $(CFLAGS) ${@}.c -o $@
 
 is_echo_sv: is_echo_sv.c inet_sockets.o
-	$(CC) is_echo_sv.c inet_sockets.o -o is_echo_sv
+	$(CC) $(CFLAGS) is_echo_sv.c inet_sockets.o -o is_echo_sv
 
-inet_sockets.o: inet_sockets.c inet_sockets.h
-	$(CC) -c inet_sockets.c -o inet_sockets.o
+%.o: %.c %.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -rf *.o $(shell find . -maxdepth 1 -type f -executable)

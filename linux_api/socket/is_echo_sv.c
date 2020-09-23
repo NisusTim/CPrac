@@ -2,7 +2,7 @@
 #include <syslog.h>
 #include <sys/wait.h>
 #include "inet_sockets.h"
-#include "lib/tlpi_hdr.h"
+#include "tlpi_hdr.h"
 
 #define SERVICE    "5000"
 #define BUFF_SIZE  4096

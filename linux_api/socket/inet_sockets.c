@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include "inet_sockets.h"
-#include "lib/tlpi_hdr.h"
+#include "tlpi_hdr.h"
 
 static int inet_passive_socket(const char *service, int type, 
                                socklen_t *addr_len, Boolean do_listen, int backlog)
