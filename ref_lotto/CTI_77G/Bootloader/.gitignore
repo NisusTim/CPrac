@@ -1,0 +1,10 @@
+Debug/
+.settings/
+/*.cproject
+/*.project
+.metadata/
+/Hirain/
+/Neusoft/
+/Hirain_CNHTC/
+/Hirain_FAW/
+/TSINTEL/
