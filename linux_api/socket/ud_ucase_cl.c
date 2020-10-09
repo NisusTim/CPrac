@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
   int sv_socket;
   size_t msg_msize;
   ssize_t recv_msize;
-  char resp[BUFF_SIZE];
+  char resp[BUFF_MSIZE];
 
   if (argc < 2 || strcmp(argv[1], "--help") == 0)
     usageErr("%s msg...\n", argv[0]);
@@ -35,11 +35,11 @@ int main(int argc, char *argv[])
   /* Send messages to server; echo responses on stdout */
   
   for (int j = 1; j < argc; ++j) {
-    msg_msize = strlen(argv[j]);  /* May be longer than BUFF_SIZE */
+    msg_msize = strlen(argv[j]);  /* May be longer than BUFF_MSIZE */
     if (sendto(sv_socket, argv[j], msg_msize, 0, (struct sockaddr *)&sv_addr, 
                sizeof(struct sockaddr_un)) != msg_msize)
       fatal("sendto");
-    recv_msize = recvfrom(sv_socket, resp, BUFF_SIZE, 0, NULL, NULL);
+    recv_msize = recvfrom(sv_socket, resp, BUFF_MSIZE, 0, NULL, NULL);
     if (recv_msize == -1)
       errExit("recvform");
     printf("Response %d: %.*s\n", j, (int)recv_msize, resp);

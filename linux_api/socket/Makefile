@@ -26,6 +26,16 @@ ud_ucase_sv: ud_ucase_sv.c ud_ucase.h
 ud_ucase_cl: ud_ucase_cl.c ud_ucase.h
 	$(CC) $(CFLAGS) ${@}.c -o $@
 
+demo_i6d_ucase: i6d_ucase_sv i6d_ucase_cl
+	./i6d_ucase_sv &
+	./i6d_ucase_cl ::1 ciao
+
+i6d_ucase_sv: i6d_ucase_sv.c i6d_ucase.h
+	$(CC) $(CFLAGS) ${@}.c -o $@
+
+i6d_ucase_cl: i6d_ucase_cl.c i6d_ucase.h
+	$(CC) $(CFLAGS) ${@}.c -o $@
+
 is_echo_sv: is_echo_sv.c inet_sockets.o
 	$(CC) $(CFLAGS) is_echo_sv.c inet_sockets.o -o is_echo_sv
 

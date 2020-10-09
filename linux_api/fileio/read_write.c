@@ -17,30 +17,30 @@ ssize_t read_line(int fd, void *buffer, size_t msize)
     return -1;
   }
 
-  buff = buffer;                   /* no pointer arithmetic on "void *" */
+  buff = buffer;                      /* no pointer arithmetic on "void *" */
   for ( ; ; ) {
 
     read_msize = read(fd, &ch, 1);
 
     switch (read_msize) {
       case -1:
-        if (errno == EINTR)        /* interrupted, restart read() */
+        if (errno == EINTR)           /* interrupted, restart read() */
           continue;
         else
           return -1;
-      case 0:                      /* EOF */
-        if (accum_msize == 0)
+      case 0:                         /* EOF */
+        if (accum_msize == 0)         /* No bytes read; return 0 */
           return 0;
-        else
+        else                          /* Some bytes read; add '\0' */
           break;
       case 1:
-        if (accum_msize < msize-1) {
+        if (accum_msize < msize-1) {  /* Discard > (msize-1) bytes */
           ++accum_msize;
           *buff++ = ch;
         }
         if (ch == '\n')
           break;
-      default:
+      default:                        /* Impossible */
         break;
     }
   } 

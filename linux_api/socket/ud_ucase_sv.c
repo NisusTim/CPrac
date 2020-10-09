@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
   int sv_socket;
   ssize_t recv_msize;
   socklen_t sock_len;
-  char buff[BUFF_SIZE];
+  char buff[BUFF_MSIZE];
 
   sv_socket = socket(AF_UNIX, SOCK_DGRAM, 0);
   if (sv_socket == -1)
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
   for (;;) {
     sock_len = sizeof(struct sockaddr_un);
-    recv_msize = recvfrom(sv_socket, buff, BUFF_SIZE, 0, 
+    recv_msize = recvfrom(sv_socket, buff, BUFF_MSIZE, 0, 
                           (struct sockaddr *)&cl_addr, &sock_len);
     if (recv_msize == -1)
       errExit("recvfrom");
